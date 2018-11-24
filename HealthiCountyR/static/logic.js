@@ -3,105 +3,108 @@ function displayCounties() {
     console.log('CountyNames');
   
     var userSelection = '';
-    var userSel = 0
+
     userSelection ='StateShortName_';
     userSelection +=$('#StateShortName option:selected').val();
-    state = $('#StateShortName option:selected').val()
     userSelection +=':preference1_';
     userSelection +=$('#Preference1 option:selected').val();
-    if ($('#Preference1 option:selected').val() !='empty') {
-        userSel = 1 
-    }
     userSelection +=':preference2_';
     userSelection +=$('#Preference2 option:selected').val();
-    if ($('#Preference2 option:selected').val() !='empty') {
-        userSel = 1 
-    }
     userSelection +=':preference3_';
     userSelection +=$('#Preference3 option:selected').val();
-    if ($('#Preference2 option:selected').val() !='empty') {
-        userSel = 1 
-    }
     userSelection +=':preference4_';
     userSelection +=$('#Preference4 option:selected').val();
-    if ($('#Preference4 option:selected').val() !='empty') {
-        userSel = 1 
-    }
+    
     console.log(userSelection);
 
     var userSelectionUrl = `/attributeSelection/${userSelection}`;
     var res = userSelectionUrl.split("empty");
-    if (state !='empty'){
-        
-        if (userSel !=0)
-         {
-            Plotly.d3.json(userSelectionUrl, function(error, response){ // ajax call
+    if (res.length != 5){
+    Plotly.d3.json(userSelectionUrl, function(error, response){ // ajax call
 
-            console.log(response); 
-            if (error) {
-            return console.log(error);
-            }
+       console.log(response); 
+        if (error) {
+          return console.log(error);
+        }
  
-        if (response !=undefined && response.length > 0 ) { // Null check
-        console.log(response);
+    if (response !=undefined && response.length > 0 ) { // Null check
+    console.log(response);
     
-        var html = '<table style="width:100%" id="uc3" class="table table-hover" >';
-        html += '<tr>';
+    var html = '<table style="width:100%" id="uc3" class="table table-hover" >';
+    html += '<tr>';
     
-        html += '<td style="color: orange">StateName</td>';
-        html += '<td style="color: orange">CountyName</td>';
-        html += '<td style="color: orange">AggregatedValue</td>';
-        html += '<td style="color: orange">Population</td>';
-        html += '<td style="color: orange">TotalArea</td>';
-        html += '<td style="color: orange">Latitude</td>';
-        html += '<td style="color: orange">Longitude</td>';
-        html += '<td style="color: orange">CountyWikiLink</td>';
-        html += '</tr>';
+    html += '<td style="color: orange">StateName</td>';
+    html += '<td style="color: orange">CountyName</td>';
+    html += '<td style="color: orange">AggregatedValue</td>';
+    html += '<td style="color: orange">Population</td>';
+    html += '<td style="color: orange">TotalArea</td>';
+    html += '<td style="color: orange">Latitude</td>';
+    html += '<td style="color: orange">Longitude</td>';
+    html += '<td style="color: orange">CountyWikiLink</td>';
+    html += '</tr>';
     
-        html += '<tr>';    
-        html += '<td>' + response[0].StateName + '</td>';
-        html += '<td>' + response[0].CountyName + '</td>';
-        html += '<td>' + response[0].AggregatedValue.toFixed(5) + '</td>' ;
-        html += '<td>' + response[0].Population + '</td>';
-        html += '<td>' + response[0].TotalArea + '</td>';
-        html += '<td>' + response[0].Latitude + '</td>';
-        html += '<td>' + response[0].Longitude + '</td>';
-        html += '<td> <div class="countyData"> <a { color: inherit; }  href="' + response[0].CountyWikiLink + '"  target="_blank">' + response[0].CountyName +'</div>' +' </td>';
-        html += '</tr>';
+    html += '<tr>';    
+    html += '<td>' + response[0].StateName + '</td>';
+    html += '<td>' + response[0].CountyName + '</td>';
+    html += '<td>' + response[0].AggregatedValue.toFixed(5) + '</td>' ;
+    html += '<td>' + response[0].Population + '</td>';
+    html += '<td>' + response[0].TotalArea + '</td>';
+    html += '<td>' + response[0].Latitude + '</td>';
+    html += '<td>' + response[0].Longitude + '</td>';
+    html += '<td> <div class="countyData"> <a { color: inherit; }  href="' + response[0].CountyWikiLink + '"  target="_blank">' + response[0].CountyName +'</div>' +' </td>';
+    html += '</tr>';
 
        
-        if (response.length > 1){
-            html += '<tr>'; 
-            html += '<td>' + response[1].StateName + '</td>';
-            html += '<td>' + response[1].CountyName + '</td>';
-            html += '<td>' + response[1].AggregatedValue.toFixed(5) + '</td>' ;
-            html += '<td>' + response[1].Population + '</td>';
-            html += '<td>' + response[1].TotalArea + '</td>';
-            html += '<td>' + response[1].Latitude + '</td>';
-            html += '<td>' + response[1].Longitude + '</td>';
-            html += '<td class="linkFill"> <div class="countyData"> <a { color: inherit; }  href="' + response[1].CountyWikiLink + '"  target="_blank">' + response[1].CountyName +'</div>' +' </td>';
-            html += '</tr>';
-        }
+    if (response.length > 1){
+        html += '<tr>'; 
+        html += '<td>' + response[1].StateName + '</td>';
+        html += '<td>' + response[1].CountyName + '</td>';
+        html += '<td>' + response[1].AggregatedValue.toFixed(5) + '</td>' ;
+        html += '<td>' + response[1].Population + '</td>';
+        html += '<td>' + response[1].TotalArea + '</td>';
+        html += '<td>' + response[1].Latitude + '</td>';
+        html += '<td>' + response[1].Longitude + '</td>';
+        html += '<td class="linkFill"> <div class="countyData"> <a { color: inherit; }  href="' + response[1].CountyWikiLink + '"  target="_blank">' + response[1].CountyName +'</div>' +' </td>';
+        html += '</tr>';
+    }
     
-        if (response.length > 2){
-            html += '<tr>';    
-            html += '<td>' + response[2].StateName + '</td>';
-            html += '<td>' + response[2].CountyName + '</td>';
-            html += '<td>' + response[2].AggregatedValue.toFixed(5) + '</td>' ;
-            html += '<td>' + response[2].Population + '</td>';
-            html += '<td>' + response[2].TotalArea + '</td>';
-            html += '<td>' + response[2].Latitude + '</td>';
-            html += '<td>' + response[2].Longitude + '</td>';
-            html += '<td> <div class="countyData"> <a { color: inherit; } href="' + response[2].CountyWikiLink + '"  target="_blank">' + response[2].CountyName +'</div>' +' </td>';
-            html += '</tr>';
-        }
+    if (response.length > 2){
+        html += '<tr>';    
+        html += '<td>' + response[2].StateName + '</td>';
+        html += '<td>' + response[2].CountyName + '</td>';
+        html += '<td>' + response[2].AggregatedValue.toFixed(5) + '</td>' ;
+        html += '<td>' + response[2].Population + '</td>';
+        html += '<td>' + response[2].TotalArea + '</td>';
+        html += '<td>' + response[2].Latitude + '</td>';
+        html += '<td>' + response[2].Longitude + '</td>';
+        html += '<td> <div class="countyData"> <a { color: inherit; } href="' + response[2].CountyWikiLink + '"  target="_blank">' + response[2].CountyName +'</div>' +' </td>';
+        html += '</tr>';
+    }
     
 
     html += '</table>';
 
     $("#uc3Table").html("");
     $("#uc3Table").append(html);
-   
+    /*['AggregatedValue', 'CountyName', 'CountyWikiLink', 'Latitude',
+    'Longitude', 'Population', 'StateLatitude', 'StateLongitude',
+    'StateName', 'StateShortName', 'TotalArea']*/
+
+    
+    
+    
+    // displayTable(response);
+
+    //var county_specs = response[0].Counties;
+
+    // Get the data from the table displayed from flask 
+    /*var CountyNames = response[0]['CountyName'];
+    var CountyWikiLinks =   response[0]['CountyWikiLink'];
+    var Latitudes = response[0]['Latitude'];
+    var Longitudes = response[0]['Longitude'];
+    var Populations = response[0]['Population']
+    var TotalAreas = response[0]['TotalArea'];
+ */
     
         var container = L.DomUtil.get('map');
         // Need to null the exiting map before reploting it
@@ -154,14 +157,10 @@ function displayCounties() {
         }
     }
     })
- }
- else {
-    alert("Please atleast one attribute!");
- }
 }
 else {
-        alert("Please select the State!");
-    }
+    alert("Please select atleast one attribute!");
+}
 }
 
 

@@ -3,30 +3,31 @@ from flask import(Flask, render_template, jsonify)
 from .Data.CountySelection import CountySelection
 from .Data.convertXlsToJSON import CreateMongoDataBase
 from .Data.Mongodbset import mongodbset
-import win32com.client as wc
-import pythoncom
+
+# from Data.convertXlsToJSON import CreateMongoDataBase
 #------------------------------------------------------------------------------------#
 # Flask Setup #
 #------------------------------------------------------------------------------------#
+## app = Flask(__name__)  ## For Local 
 
-app = Flask(__name__, template_folder='templates') 
+app = Flask(__name__, template_folder='templates') # For Heroku
 
 #------------------------------------------------------------------------------------#
 # Local MongoDB connection #
 #------------------------------------------------------------------------------------#
-conn = "mongodb://localhost:27017" 
-client = MongoClient(conn)
-# create / Use database
-db = client.healthi_db
+# conn = "mongodb://localhost:27017"
+# client = MongoClient(conn)
+# # create / Use database
+# db = client.healthi_db
 #------------------------------------------------------------------------------------#
 # MLab MongoDB connection #
 #------------------------------------------------------------------------------------#
-# #### Connection for remote host
-# conn = 'mongodb://<dbuser>:<dbpassword>@ds255332.mlab.com:55332/healthi_db'
-
-# client = MongoClient(conn,ConnectTimeoutMS=30000)
-# db = client.get_default_database()
-# #------------------------------------------------------------------------------------#
+#### Connection for remote host
+####conn = 'mongodb://<dbuser>:<dbpassword>@ds255332.mlab.com:55332/healthi_db'
+conn = 'mongodb://Riicha:polkA#1122@ds113873.mlab.com:13873/healthi_db'
+client = MongoClient(conn,ConnectTimeoutMS=30000)
+db = client.get_default_database()
+#------------------------------------------------------------------------------------#
 #### Initialise and populate the Collection / Database
 #------------------------------------------------------------------------------------#
 def InitializeDataBase():
@@ -122,11 +123,8 @@ def zscore(state):
 @app.route("/countygeodetails/<state>")
 def geodemo(state):
     sample_list=[]
-
-    # Get only the state selected by the user
     for item in db.State.find({'StateName': state}):
         State_Counties = item['Counties']
-        
         for geodemo in State_Counties:
             sample_list.append({geodemo['County']['CountyName']:{  
             'Latitude' : geodemo['County']['Latitude'],
@@ -141,7 +139,6 @@ def geodemo(state):
 @app.route("/countyalldetails/<state>")
 def details(state):
     sample_list = []
-    
     for item in db.State.find({'StateName': state}):
         Statedetaildict = {}
         Statedetaildict['State'] = item['StateName']
@@ -153,14 +150,6 @@ def details(state):
     return jsonify(sample_list)        
 
 # RM Added route for UC3
-def speakUserSelection(state,topCounty):
-    pythoncom.CoInitialize()
-    # response = "Hello user! "
-    response = "Hello user! " + "You selected " + state + ". It's best county, based on your selection is "+ topCounty   
-    response += ".  All the best in your search for a good place to live in " + topCounty
-    speak = wc.Dispatch("Sapi.SpVoice")
-    speak.speak(response)
-
 # User selection is sent
 @app.route('/attributeSelection/<userSelection>')
 def result(userSelection):
@@ -178,13 +167,11 @@ def result(userSelection):
 
     #   Get the Top 3 counties per user selection
     top3Counties = []
-    topCounty = ""
-    State = ""
     if(len(selection)>0):
         userPref = CountySelection(selection) 
         userPref = userPref.Selection()
-        RecommendedCounty ={}
         
+        RecommendedCounty ={}
         for  index , row in userPref.iterrows():
             RecommendedCounty =  {'AggregatedValue': row['AggregatedValue'],
             'CountyName':row['CountyName'], 
@@ -198,12 +185,7 @@ def result(userSelection):
             'StateShortName': row['StateShortName'], 
             'TotalArea' : row['TotalArea']
             }
-            if (State == ''):
-                topCounty = row['CountyName']
-                State = row['StateName']
             top3Counties.append(RecommendedCounty)
-    
-    speakUserSelection(State,topCounty)
     #   Send back the html back to user
     return jsonify(top3Counties)
   
@@ -213,7 +195,7 @@ def result(userSelection):
 #------------------------------------------------------------------------------------#
 if __name__=="__main__":
     connect_args={'check_same_thread':False} 
-    # InitializeDataBase() 
+    InitializeDataBase() 
     app.run(debug=True)
     
 
