@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Healthy_County</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">   
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.3/dist/leaflet.css"
+  integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
+  crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.3.3/dist/leaflet.js"
+  integrity="sha512-tAGcCfR4Sc5ZP5ZoVz0quoZDYX5aCtEm/eu1KhSLj2c9eFrylXZknQYmxUssFaVJKvvc0dJQixhGjG2yXWiV9Q=="
+  crossorigin=""></script>  
+  
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script> 
+
+
+
+<style>  
+  tr:hover td {background:olivedrab}
+</style>
+</head>
+
+<body id="myPage" data-spy="scroll" data-target=".navbar" data-offset="60">   
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span> 
+                </button>
+                <a class="navbar-brand" href="#myPage">Healthy County</a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav navbar-right"> 
+                    <li><a href="#county">State and County Selector</a></li>
+                    <li><a href="#state">State Selector</a></li>
+                    <li><a href="#UC3">Attribute Selector</a></li>
+                    <!-- li><a href="#portfolio">Portfolio</a></li -->
+                    <li><a href="#aboutproject">About Project</a></li>
+                    <li><a href="#aboutus">About Us</a></li>  
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Use Case 1 : State and County Drop down for ranks and plots -->
+    <div class="jumbotron jumbotron-fluid text-center"> <div id="county" class="container">
+        <!-- Marquee tag -->
+        <div>
+            <h3>
+                <marquee bg>World Health Organization holistic definition of health - Health is a state of complete physical, mental, and social well-being and not merely the absence of disease or infirmity. It matters where we live!!!</marquee>
+                <img id="leafImage">
+            </h3>
+        </div>
+        <!-- Drop down panel -->
+        <div class="row content">
+            <div class="col-md-4 text-center">                    
+                    <select class="form-control" id="stateselect"> <option value="empty">Select State</option>
+                    </select>
+                <hr>
+                    <select class="form-control" id="countyselect">
+                                <option value="empty">Select County</option>
+                    </select>
+                <!-- County Background Panel -->
+                <div class="row">
+                        <div class="col-md-12">
+                            <div class="metadata-of-sample">
+
+                                <h4 id="count" style="color: lightgreen"></h4>
+                                <hr>
+                                <table id="county-background" class="table table-hover">
+                                    <thead>
+                                        <tr id="sample-metadata">
+                                            <td align="left" style="color: orange"><strong> Attribute </strong></td>
+                                            <td align="left" style="color: orange"><strong> County Rank</strong></td>
+                                        </tr>
+                                    </thead>
+                                    <tbody align="left">
+
+                                    </tbody>
+                                </table>
+                                <div align="left"> NOTE:
+                                        <li style="color:orangered">Please refresh the browser on change of State.
+                                        <li>Select State and see all counties marked on the map.
+                                        <li>Select State and county to get county's ranking.
+                                        <li>Select State and Attribute to get the top 3 counties.
+                                        <li>Click on the icons on the map for more details.
+                                </div>
+                            </div>
+                        </div>
+                </div>
+
+            </div>
+            
+            <div class="col-md-1"> </div>
+
+        
+
+            <!-- Plot Panel -->
+            <div class="col-md-7 sidenav">
+                    <div>
+                            <select class="form-control" id="attributerank"> 
+                                <option value="empty">Select Attribute</option>
+                                <option value = "Quality of Life">Quality of Life</option>
+                                <option value = "Economic Factors">Economic Factors</option>
+                                <option value = "Physical Environment">Physical Environment</option>
+                                <option value = "Health Behaviours">Health Behaviours</option>
+                                <option value = "Clinical Care">Clinical Care</option>
+                            </select>
+                    </div> <br>
+                <div id = "map"></div>
+            </div>
+
+
+            </div>  
+
+
+        </div>
+
+    <hr>
+    <!-- Use Case 2 : Top 10 counties of a selected state-->
+    <div class="jumbotron text-center"> 
+        <div id="state" class="container"> 
+            <div class="row">
+                <br>
+                <h3 align="left">Top 10 Counties of a State based on Health Factors</h3>
+                <br>
+
+            </div> 
+            <div align="left"> NOTE: Select State to get its top 10 Counties</div>
+            <div class="row">
+                <div class="col-lg-4 text-center">                    
+                        <select class="form-control" id="stateselect2"> <option value="empty">Select State</option>
+                        </select>
+                    <!-- Top 10 County Panel -->
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="top-10-counties">
+                                <h4 class="card-title text-dark" style="color: orange">
+                                    Top 10 Counties
+                                </h4>
+                                <table id="county-background2" class="table table-hover">
+                                    <thead>
+                                        <tr id="top-10-counties-table">
+                                            <td style="color: orange"><strong> County </strong></td>
+                                            <td style="color: orange"><strong> County Rank</strong></td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>    
+                </div>                              
+                <div id="top10counties" class="col-lg-8">                    
+                </div> 
+            </div>  
+        </div>
+    </div>
+    <hr>
+    <!--  -----------------UC3-----Begin------------------------  -->
+    <h3 align="left">User's Choice :      Select Attributes and a State to get details of Top 3 Healthy Counties</h3>
+    <br>
+    <br>
+    <div align="left"> NOTE: Check the map again to locate these counties.</div>
+    <!-- div class="jumbotron text-center" --> 
+        <div id="UC3"></div>
+        
+    
+        <div class="col-md-12 tableHeader">
+            <div class="col-md-2" >
+                State Short Name
+            </div>
+            
+            <div class="col-md-2">
+                Preference 1
+            </div>
+            
+            <div class="col-md-2">
+                Preference 2    
+            </div>
+            
+            <div class="col-md-2">
+                Preference 3
+            </div>
+            
+            <div class="col-md-2">
+                Preference 4
+            </div>
+            
+            <div class="col-md-2">
+            </div>
+               
+        </div>
+        
+        <div class="col-md-12 ">
+            <div class="col-md-2 dropDownlabels">
+                <select class="form-control" id="StateShortName" name="StateShortName" aria-placeholder="Select Sample">
+                    <option value="empty">Select State</option>
+                    <option value = "AK">Alaska</option>
+                    <option value = "CA">California</option>
+                    <option value = "CT">Connecticut</option>
+                    <option value = "NJ">New Jersey</option>
+                    <option value = "NY">New York</option>
+                </select>
+            </div>
+            
+            <div class="col-md-2 dropDownlabels">
+                <select class="form-control" id="Preference1" name="Preference1"> 
+                    <option value="empty">Select Attribute</option>
+                    <option value = "QualityofLife">Quality of Life</option>
+                    <option value = "EconomicFactors">Economic Factors</option>
+                    <option value = "PhysicalEnvironment">Physical Environment</option>
+                    <option value = "HealthBehaviours">Health Behaviours</option>
+                    <option value = "ClinicalCare">Clinical Care</option>
+                </select>
+            </div>
+            
+            <div class="col-md-2 dropDownlabels">
+                <select class="form-control" id="Preference2" name="Preference2"> 
+                    <option value="empty">Select Attribute</option>
+                    <option value = "QualityofLife">Quality of Life</option>
+                    <option value = "EconomicFactors">Economic Factors</option>
+                    <option value = "PhysicalEnvironment">Physical Environment</option>
+                    <option value = "HealthBehaviours">Health Behaviours</option>
+                    <option value = "ClinicalCare">Clinical Care</option>
+                </select>    
+            </div>
+            
+            <div class="col-md-2 dropDownlabels">
+                <select class="form-control" id="Preference3" name="Preference3" > 
+                    <option value="empty">Select Attribute</option>
+                    <option value = "QualityofLife">Quality of Life</option>
+                    <option value = "EconomicFactors">Economic Factors</option>
+                    <option value = "PhysicalEnvironment">Physical Environment</option>
+                    <option value = "HealthBehaviours">Health Behaviours</option>
+                    <option value = "ClinicalCare">Clinical Care</option>
+                </select>
+            </div>
+            
+            <div class="col-md-2 dropDownlabels">
+                <select class="form-control" id="Preference4" name="Preference4"> 
+                    <option value="empty">Select Attribute</option>
+                    <option value = "QualityofLife">Quality of Life</option>
+                    <option value = "EconomicFactors">Economic Factors</option>
+                    <option value = "PhysicalEnvironment">Physical Environment</option>
+                    <option value = "HealthBehaviours">Health Behaviours</option>
+                    <option value = "ClinicalCare">Clinical Care</option>
+                </select>
+            </div>
+            
+            <div class="col-md-2 dropDownlabels">
+                <button class="SubmitButton" type="button" id="userSelectionButton" name="userSelectionButton" >Submit</button>
+            </div>    
+        </div>
+    
+        <div class="col-md-12 sidenav">
+       
+            <!-- div id = "mapUC3" name="mapUC3"></div -->
+    
+       </div>
+       
+       <div id="uc3Table" name="uc3Table" class="col-md-12 countyData" >
+    
+       </div>
+
+    
+    <!-- /div -->
+
+
+    <br>
+
+   
+
+
+  
+
+    <div id ="countyFacts" name="countyFacts"></div>
+    
+    
+    <script type=text/javascript>
+        $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    </script>
+    <script>
+        $(document).ready(function(){
+          $('#userSelectionButton').click(function(){
+            displayCounties();
+          });
+        });
+      </script>
+
+
+    <!--  --------------End ---UC3-----------------------------  -->
+
+
+
+    
+        <!-- Project Area
+        <div class="container-fluid text-center"> <div id="portfolio" class="container-fluid">
+                <h2>Our Visualizations!</h2>
+                <h4>What we have created</h4>
+                <div class="row text-center">
+                  <div class="col-sm-4">
+                    <div class="thumbnail">
+                      <img src="Plot1.jpg" alt="Plot1">
+                      <p><strong>Plot 1</strong></p>
+                      <p>Quick Description</p>
+                    </div>
+                  </div>
+                  <div class="col-sm-4">
+                    <div class="thumbnail">
+                      <img src="Plot2.jpg" alt="Plot2">
+                      <p><strong>Plot 2</strong></p>
+                      <p>Quick Description</p>
+                    </div>
+                  </div>
+                  <div class="col-sm-4">
+                    <div class="thumbnail">
+                            <img src="Plot3.jpg" alt="Plot3">
+                            <p><strong>Plot 3</strong></p>
+                            <p>Quick Description</p>
+                    </div>
+                  </div>
+        </div>
+        <hr> -->
+        <!-- About our Project -->
+        <hr>
+        <div class="jumbotron text-center"> <div id="aboutproject" class="container-fluid">
+                <div class ="row">
+                        <div class="col-lg-12 alignTextLeft">  
+                            <h2 style="font-size:30px;"><strong>Healthy County</strong></h2>
+                            <h3 align="left" style="color:orange;">Objective:</h3>
+                            <ul>
+                                <li align="left" style="font-size:20px">How can we quantitively and qualitatively measure the health of a county?</li>
+                                <li align="left" style="font-size:20px">What are the factors that make a county healthy?</li>
+                                <li align="left" style="font-size:20px">How can we select a county based on the health parameters (e.g. air quality or proximity to health centers) that matter to an individual or families?</li>
+                            </ul>
+                            <h3 align="left" style="color:orange;">Approach:</h3>
+                            <ul>
+                                <li align="left" style="font-size:20px">Offer users the flexibility to select state and county of their choice. Based on the selection, display the 5 attributes that we have considered for the project, and respective ranks.</li>
+                                <li align="left" style="font-size:20px">Offer users the flexibility to select state and attribute of their choice, and ability to select one of top 3 counties for the selection</li>
+                                <li align="left" style="font-size:20px">Offer map visualization as a tool to compare and contrast the counties for a selected state</li>
+                            </ul>
+                            <h3 align="left" style="color:orange;">Technology Stack:</h3>
+                            <ul>
+                                <li align="left" style="font-size:20px">Presentation Layer: HTML, CSS, Bootstrap</li>
+                                <li align="left" style="font-size:20px">Middleware: Flask</li>
+                                <li align="left" style="font-size:20px">DataBase: MONGODB</li>
+                                <li align="left" style="font-size:20px">Programming Languages: Python, Javascript, Jquery</li>
+                                <li align="left" style="font-size:20px">Vizualization: Leaflet & D3</li>
+                                <li align="left" style="font-size:20px">New libraries: glob2, xlrd</li>
+                            </ul>
+                        </div>
+                </div>
+        </div> 
+
+
+        <hr>               
+        <!-- About us -->
+        <div class="jumbotron text-center"> <div id="aboutus" class="container-fluid">
+                <div class ="row">
+                    <div class="col-lg-12">  
+                        <h4>Healthy County Team</h4>
+                        <br>
+                        <br>
+                    </div>
+                </div>         
+                <div class="row">
+                    <div class="col-lg-6">  
+                        <p class="text-center sub-head" style="color:orange;">Pragati Mehta</p> 
+                        <p class="alignTextLeft"><i>"From ideation till execution, learning, working together enjoyed every part of the project!"</i></p>           
+                    </div>
+                    <div class="col-lg-6">        
+                        <p class="text-center sub-head" style="color:orange;">Riicha Mohan</p>           
+                        <p class="alignTextLeft"><i>"In a project, every person, each piece is equally important, however small or seemingly insignificant they may seem, just like the nuts and bolts of a giant machine and time is the 'Essence'!"</i></p>
+                    </div>
+                </div>
+                <br>
+                <br>
+                <div class="row">
+                    <div class="col-lg-6">  
+                        <p class="text-center sub-head" style="color:orange;">Sivakumar Venkatachalam</p>             
+                        <p class="alignTextLeft"><i>"A project full of learnings!"</i></p>
+                    </div>
+                    <div class="col-lg-6">
+                        <p class="text-center sub-head" style="color:orange;">Supriya Satpathy</p>
+                        <p class="alignTextLeft"><i>"The power of building on each other's work and collectively looking at the final product!"</i></p>           
+                    </div>
+                </div>        
+                </div> 
+        </div>          
+
+</body>
+
+<!-- Script Libraries -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.5.0/d3.js"></script>
+<script src="{{ url_for('static', filename='countyselection.js') }}"></script>
+<script src="{{ url_for('static', filename='top10CountiesbyRank.js') }}"></script>
+<script src="{{ url_for('static', filename='logic.js') }}"></script>
+<script src="{{ url_for('static', filename='index.js') }}"></script>
+
+
+</html>
